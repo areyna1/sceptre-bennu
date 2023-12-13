@@ -49,6 +49,12 @@ bool FieldDevice::handleTreeData(const ptree& tree)
             mOutputModules.push_back(mod);
         }
 
+	if (tree.get_child_optional("comms"))
+        {
+            ptree commsTree = tree.get_child("comms");
+            comms::CommsModuleCreator::the()->handleCommsTreeData(commsTree, mDataManager);
+        }
+
         if (tree.get_child_optional("tags"))
         {
             ptree tagTree = tree.get_child("tags");
@@ -90,12 +96,6 @@ bool FieldDevice::handleTreeData(const ptree& tree)
                     mDataManager->addAnalogTag(tag);
                 }
             }
-        }
-
-        if (tree.get_child_optional("comms"))
-        {
-            ptree commsTree = tree.get_child("comms");
-            comms::CommsModuleCreator::the()->handleCommsTreeData(commsTree, mDataManager);
         }
 
         startDevice();
