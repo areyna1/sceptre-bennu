@@ -10,6 +10,7 @@
 
 #include "opendnp3/DNP3Manager.h"
 
+#include "bennu/devices/field-device/DataManager.hpp"
 #include "bennu/devices/modules/comms/base/Common.hpp"
 #include "bennu/devices/modules/comms/base/CommsClient.hpp"
 #include "bennu/devices/modules/comms/dnp3/module/ClientConnection.hpp"
@@ -28,7 +29,12 @@ class Client : public comms::CommsClient, public utility::DirectLoggable, public
 public:
     Client();
 
+    Client(std::shared_ptr<field_device::DataManager> dm);
+
     ~Client();
+
+    void start();
+    void update();
 
     void addTagConnection(const std::string& tag, std::shared_ptr<ClientConnection> connection);
     void addTagConnection(const std::string& tag, std::shared_ptr<ClientConnection> connection, const bool sbo);
