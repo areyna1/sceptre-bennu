@@ -135,6 +135,7 @@ void FieldDevice::scanCycle()
     {
         if (mLogicModule)
         {
+	    std::cout << "MEG DEBUG: In scanCycle LogicModule" << std::endl;
             mLogicModule->scanInputs();
             mLogicModule->scanLogic(mCycleTime);
         }

@@ -187,6 +187,7 @@ void DataHandler::parseClientTree(std::shared_ptr<Client> client, const ptree &t
                 rd.mTag = iter->second.get<std::string>("tag");
                 client->addTagConnection(rd.mTag, connection);
                 connection->addAnalog(rd.mTag, rd);
+		client->addTagDataManager(rd.mTag, connection);
             }
             auto analogOutputs = itr->second.equal_range("analog-output");
             for (auto iter = analogOutputs.first; iter != analogOutputs.second; ++iter)
