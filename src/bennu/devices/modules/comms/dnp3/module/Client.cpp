@@ -33,7 +33,6 @@ Client::~Client()
 
 void Client::start()
 {
-    std::cout << "MEG DEBUG: this theoretically where client should loop" << std::endl;	
     mUpdateThread.reset(new std::thread(std::bind(&Client::update, this)));
 }
 
@@ -42,36 +41,28 @@ void Client::update()
     int i = 0;
     while (1)
     {
-	if (i % 100000 == 0)
-	{
-	    sleep(5);
-	    std::set<std::string> tags = getTags();
-	    for (auto iter = tags.begin(); iter != tags.end(); ++iter)
+        std::set<std::string> tags = getTags();
+        for (auto iter = tags.begin(); iter != tags.end(); ++iter)
+        {
+	    std::shared_ptr<ClientConnection> connection = mTagsToConnection[*iter];
+	    comms::RegisterDescriptor rd;
+	    auto status = connection->readRegisterByTag(*iter, rd);
+
+	    if (rd.mRegisterType == 1 || rd.mRegisterType == 2) //Status
 	    {
-	        //call read tag next
-		std::shared_ptr<ClientConnection> connection = mTagsToConnection[*iter];
-		comms::RegisterDescriptor rd;
-		auto status = connection->readRegisterByTag(*iter, rd);
-	
-		if (rd.mRegisterType == 1 || rd.mRegisterType == 2) //Status
-		{
-		    mDataManager->setDataByPoint<bool>(*iter, rd.mStatus);
-		}
-		else if (rd.mRegisterType == 3 || rd.mRegisterType == 4) // value
-		{
-	    	    mDataManager->setDataByPoint<double>(*iter, rd.mFloatValue);
-		}
-		else if (rd.mRegisterType == 5 || rd.mRegisterType == 6) //int
-		{
-		    mDataManager->setDataByPoint<double>(*iter, rd.mIntValue);
-		}	
-	    } 
-	    i=0;	
+	        mDataManager->setDataByTag<bool>(*iter, rd.mStatus);
+	    }
+	    else if (rd.mRegisterType == 3 || rd.mRegisterType == 4) // value
+	    {
+		mDataManager->setDataByTag<double>(*iter, rd.mFloatValue);
+	    }
+	    else if (rd.mRegisterType == 5 || rd.mRegisterType == 6) //int
+	    {
+	        mDataManager->setDataByTag<double>(*iter, rd.mIntValue);
+	    }	
 	}
-	else
-	{
-	    i++;
-	}
+	sleep(5);
+	std::this_thread::sleep_for(std::chrono::milliseconds(60));
     }
 }
 
@@ -89,19 +80,21 @@ void Client::addTagConnection(const std::string& tag, std::shared_ptr<ClientConn
 
 void Client::addTagDataManager(const std::string& tag, std::shared_ptr<ClientConnection> connection)
 {
-    std::cout << "MEG DEBUG: dnp3 Client.cpp -- addTagConnection" << std::endl;
     mTagsToConnection[tag] = connection;
     comms::RegisterDescriptor rd;
     connection->readRegisterByTag(tag, rd);
-    std::cout << "MEG DEBUG: dnp3 Client.cpp -- addTagConnection -- register type " << rd.mRegisterType << std::endl;
     if (rd.mRegisterType == 1 || rd.mRegisterType == 2)
     {
     	mDataManager->addExternalData<bool>(tag, tag);
+    	mDataManager->addTagToPointMapping(tag, tag);
+    	mDataManager->addBinaryTag(tag);
 	std::cout << "add binary  " << tag << std::endl;
     }
     else if (rd.mRegisterType == 3 || rd.mRegisterType == 4 || rd.mRegisterType == 5 || rd.mRegisterType == 6)
     {
     	mDataManager->addExternalData<double>(tag, tag);
+    	mDataManager->addTagToPointMapping(tag, tag);
+    	mDataManager->addAnalogTag(tag);
 	std::cout << "add analog " << tag << std::endl;
     }
 }

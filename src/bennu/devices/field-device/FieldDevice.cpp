@@ -49,12 +49,6 @@ bool FieldDevice::handleTreeData(const ptree& tree)
             mOutputModules.push_back(mod);
         }
 
-	if (tree.get_child_optional("comms"))
-        {
-            ptree commsTree = tree.get_child("comms");
-            comms::CommsModuleCreator::the()->handleCommsTreeData(commsTree, mDataManager);
-        }
-
         if (tree.get_child_optional("tags"))
         {
             ptree tagTree = tree.get_child("tags");
@@ -98,7 +92,13 @@ bool FieldDevice::handleTreeData(const ptree& tree)
             }
         }
 
-        startDevice();
+ 	if (tree.get_child_optional("comms"))
+        {
+            ptree commsTree = tree.get_child("comms");
+            comms::CommsModuleCreator::the()->handleCommsTreeData(commsTree, mDataManager);
+        }
+
+       startDevice();
         return true;
     }
     catch (ptree_bad_path& e)
@@ -133,9 +133,9 @@ void FieldDevice::scanCycle()
     int i = 1;
     while (1)
     {
+	std::cout << " " << std::endl;
         if (mLogicModule)
         {
-	    std::cout << "MEG DEBUG: In scanCycle LogicModule" << std::endl;
             mLogicModule->scanInputs();
             mLogicModule->scanLogic(mCycleTime);
         }
