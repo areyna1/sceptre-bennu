@@ -14,9 +14,9 @@
 namespace bennu {
 namespace comms {
 namespace dnp3 {
-
-Server::Server(std::shared_ptr<field_device::DataManager> dm) :
-    bennu::utility::DirectLoggable("dnp3-server")
+Server::Server(std::shared_ptr<field_device::DataManager> dm, std::chrono::seconds pollRate) :
+    bennu::utility::DirectLoggable("dnp3-server"),
+    mPollRate(pollRate)
 {
     // Initialize outstation stack
     mManager.reset(new opendnp3::DNP3Manager(std::thread::hardware_concurrency(), opendnp3::ConsoleLogger::Create()));
@@ -160,7 +160,7 @@ void Server::update()
                 mOutstation->Apply(builder.Build());
             }
         }
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(durationToDuration(this->pollRate));
     }
 }
 
