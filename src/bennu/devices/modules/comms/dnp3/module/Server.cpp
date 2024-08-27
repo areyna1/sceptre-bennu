@@ -23,6 +23,13 @@ Server::Server(std::shared_ptr<field_device::DataManager> dm, std::chrono::secon
     setDataManager(dm);
 }
 
+constexpr auto durationToDuration(const float time_s)
+{
+    using namespace std::chrono;
+    using fsec = duration<float>;
+    return round<nanoseconds>(fsec{time_s});
+}
+
 void Server::init(const std::string& endpoint, const std::uint16_t& address)
 {
     // Add TCPServer channel
