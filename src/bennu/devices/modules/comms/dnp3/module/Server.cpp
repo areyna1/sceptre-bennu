@@ -167,7 +167,7 @@ void Server::update()
                 mOutstation->Apply(builder.Build());
             }
         }
-        std::this_thread::sleep_for(durationToDuration(this->pollRate));
+        std::this_thread::sleep_for(durationToDuration(this->mPollRate));
     }
 }
 
