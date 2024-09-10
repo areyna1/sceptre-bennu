@@ -117,6 +117,13 @@ struct Dto
     }
 };
 
+constexpr auto durationToDuration(const float time_s)
+{
+    using namespace std::chrono;
+    using fsec = duration<float>;
+    return round<nanoseconds>(fsec{time_s});
+}
+
 
 class BennuSimulinkProvider : public Provider
 {
