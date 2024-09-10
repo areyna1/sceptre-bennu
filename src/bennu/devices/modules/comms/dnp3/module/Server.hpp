@@ -35,7 +35,7 @@ struct Point {
 class Server : public CommsModule, public utility::DirectLoggable, public std::enable_shared_from_this<Server>
 {
 public:
-    Server(std::shared_ptr<field_device::DataManager> dm);
+    Server(std::shared_ptr<field_device::DataManager> dm, std::chrono::milliseconds pollRate);
 
     void init(const std::string& endpoint, const std::uint16_t& address);
 
@@ -91,6 +91,8 @@ private:
     std::map<uint16_t, Point<opendnp3::StaticAnalogVariation, opendnp3::EventAnalogVariation>> mAnalogPoints;
 
     std::ostringstream mLogStream; // Logging output stream
+
+    std::chrono::milliseconds mPollRate; // Creating member variable for poll rate
 };
 
 } // namespace dnp3
