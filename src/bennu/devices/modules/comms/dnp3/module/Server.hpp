@@ -91,7 +91,7 @@ private:
     std::map<uint16_t, Point<opendnp3::StaticAnalogVariation, opendnp3::EventAnalogVariation>> mAnalogPoints;
 
     std::ostringstream mLogStream; // Logging output stream
-
+    std::shared_ptr<field_device::DataManager> mDataManager; // Adding member variable for data manager
     std::chrono::milliseconds mPollRate; // Creating member variable for poll rate
 };
 

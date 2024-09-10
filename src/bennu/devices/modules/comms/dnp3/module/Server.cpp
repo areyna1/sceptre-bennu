@@ -14,20 +14,15 @@
 namespace bennu {
 namespace comms {
 namespace dnp3 {
-Server::Server(std::shared_ptr<field_device::DataManager> dm, std::chrono::seconds pollRate) :
+
+Server::Server(std::shared_ptr<field_device::DataManager> dm, std::chrono::milliseconds pollRate) :
     bennu::utility::DirectLoggable("dnp3-server"),
-    mPollRate(pollRate)
+    mDataManager(dm), // Initialize mDataManager
+    mPollRate(pollRate) // Initialize mPollRate
 {
     // Initialize outstation stack
     mManager.reset(new opendnp3::DNP3Manager(std::thread::hardware_concurrency(), opendnp3::ConsoleLogger::Create()));
     setDataManager(dm);
-}
-
-constexpr auto durationToDuration(const float time_s)
-{
-    using namespace std::chrono;
-    using fsec = duration<float>;
-    return round<nanoseconds>(fsec{time_s});
 }
 
 void Server::init(const std::string& endpoint, const std::uint16_t& address)
@@ -37,7 +32,7 @@ void Server::init(const std::string& endpoint, const std::uint16_t& address)
 
     // If endpoint starts with tcp://, parse ip/port and use TCP
     std::size_t findResult = endpoint.find("tcp://");
-    
+
     // Use Serial
     if (findResult == std::string::npos)
     {
@@ -167,7 +162,7 @@ void Server::update()
                 mOutstation->Apply(builder.Build());
             }
         }
-        std::this_thread::sleep_for(durationToDuration(this->mPollRate));
+        std::this_thread::sleep_for(mPollRate); // Use the poll rate
     }
 }
 

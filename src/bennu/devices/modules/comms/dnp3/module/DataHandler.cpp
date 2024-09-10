@@ -23,7 +23,11 @@ std::shared_ptr<CommsModule> DataHandler::handleServerTreeData(const ptree& tree
     auto servers = tree.equal_range("dnp3-server");
     for (auto iter = servers.first; iter != servers.second; ++iter)
     {
-        std::shared_ptr<Server> server(new Server(dm));
+        // Read the poll rate from the property tree, defaulting to 1000 milliseconds if not specified
+        std::chrono::milliseconds pollRate(iter->second.get<unsigned int>("poll-rate", 1000));
+
+        // Create the Server instance with the poll rate
+        std::shared_ptr<Server> server(new Server(dm, pollRate));
         std::string log = iter->second.get<std::string>("event-logging", "dnp3-server.log");
         server->configureEventLogging(log);
         parseServerTree(server, iter->second);
@@ -127,7 +131,7 @@ void DataHandler::parseServerTree(std::shared_ptr<Server> server, const ptree& t
             server->addAnalogOutput(address, tag, sbo);
             std::cout << "add dnp3 analog-output " << tag << std::endl;
         }
-	std::string endpoint = tree.get<std::string>("endpoint");
+        std::string endpoint = tree.get<std::string>("endpoint");
         std::uint16_t address = tree.get<uint16_t>("address");
         // Initialize DNP3 server (outstation). Won't start server until enable() is called
         server->init(endpoint, address);
