@@ -11,6 +11,7 @@ execute_process(
 # unix timestamp
 string(TIMESTAMP BUILD_TIMESTAMP "%s")
 
+
 # CMake requires semantic versions with integer components
 # Set it to something static so stuff works
 # Example: 6.0.1707507861

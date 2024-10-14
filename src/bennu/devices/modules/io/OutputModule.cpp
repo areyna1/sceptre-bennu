@@ -31,9 +31,9 @@ void OutputModule::scanOutputs()
     for (auto& t : aTags)
     {
         std::string point;
-        if (mDataManager->getPointByTag(t.first, point))
+	if (mDataManager->getPointByTag(t.first, point))
         {
-            // write to provider
+            // write to provideri
             mClient->writePoint(point, t.second);
             // write to rtu datastore
             mDataManager->setDataByTag<double>(t.first, t.second);

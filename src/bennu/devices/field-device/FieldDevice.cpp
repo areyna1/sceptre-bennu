@@ -92,13 +92,13 @@ bool FieldDevice::handleTreeData(const ptree& tree)
             }
         }
 
-        if (tree.get_child_optional("comms"))
+ 	if (tree.get_child_optional("comms"))
         {
             ptree commsTree = tree.get_child("comms");
             comms::CommsModuleCreator::the()->handleCommsTreeData(commsTree, mDataManager);
         }
 
-        startDevice();
+       startDevice();
         return true;
     }
     catch (ptree_bad_path& e)
@@ -133,6 +133,7 @@ void FieldDevice::scanCycle()
     int i = 1;
     while (1)
     {
+	std::cout << " " << std::endl;
         if (mLogicModule)
         {
             mLogicModule->scanInputs();
