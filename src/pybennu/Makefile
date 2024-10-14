@@ -39,6 +39,7 @@ endef
 PACKAGE_SECTION = python
 PACKAGE_PRIORITY = optional
 PACKAGE_COMPRESSION = bzip2
+<<<<<<< HEAD
 # 6.0.1707507794.8a88a442
 PACKAGE_FULL_VERSION := 6.0.$(shell date +%s).$(shell git rev-parse --short HEAD)
 PACKAGE_NAME = pybennu

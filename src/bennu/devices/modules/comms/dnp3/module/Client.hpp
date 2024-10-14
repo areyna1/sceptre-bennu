@@ -5,11 +5,13 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <thread> 
 
 #include <boost/property_tree/ptree.hpp>
 
 #include "opendnp3/DNP3Manager.h"
 
+#include "bennu/devices/field-device/DataManager.hpp"
 #include "bennu/devices/modules/comms/base/Common.hpp"
 #include "bennu/devices/modules/comms/base/CommsClient.hpp"
 #include "bennu/devices/modules/comms/dnp3/module/ClientConnection.hpp"
@@ -28,11 +30,16 @@ class Client : public comms::CommsClient, public utility::DirectLoggable, public
 public:
     Client();
 
+    Client(std::shared_ptr<field_device::DataManager> dm);
+
     ~Client();
+
+    void start();
+    void update();
 
     void addTagConnection(const std::string& tag, std::shared_ptr<ClientConnection> connection);
     void addTagConnection(const std::string& tag, std::shared_ptr<ClientConnection> connection, const bool sbo);
-
+    void addTagDataManager(const std::string& tag, std::shared_ptr<ClientConnection> connection);
     bool tagRegister(const std::string& name, comms::RegisterType registerType, std::uint16_t address);
 
     std::shared_ptr<opendnp3::DNP3Manager> getManager()
@@ -54,6 +61,7 @@ public:
 private:
     std::map<std::string, std::shared_ptr<ClientConnection>> mTagsToConnection;
     std::shared_ptr<opendnp3::DNP3Manager> mManager; // DNP3 stack manager
+    std::shared_ptr<std::thread> mUpdateThread;
     Client(const Client&);
     Client& operator =(const Client&);
 

@@ -42,7 +42,7 @@ std::shared_ptr<CommsModule> DataHandler::handleClientTreeData(const ptree& tree
     auto clients = tree.equal_range("dnp3-client");
     for (auto iter = clients.first; iter != clients.second; ++iter)
     {
-        std::shared_ptr<Client> client(new Client);
+        std::shared_ptr<Client> client(new Client(dm));
         parseClientTree(client, iter->second);
         return client;
     }
@@ -191,6 +191,7 @@ void DataHandler::parseClientTree(std::shared_ptr<Client> client, const ptree &t
                 rd.mTag = iter->second.get<std::string>("tag");
                 client->addTagConnection(rd.mTag, connection);
                 connection->addAnalog(rd.mTag, rd);
+		client->addTagDataManager(rd.mTag, connection);
             }
             auto analogOutputs = itr->second.equal_range("analog-output");
             for (auto iter = analogOutputs.first; iter != analogOutputs.second; ++iter)
@@ -252,6 +253,7 @@ void DataHandler::parseClientTree(std::shared_ptr<Client> client, const ptree &t
             ep.str = tree.get<std::string>("command-interface");
             std::shared_ptr<comms::CommandInterface> ci(new comms::CommandInterface(ep, client));
             client->addCommandInterface(ci);
+	    client->start();
             ci->start();
         }
     }
