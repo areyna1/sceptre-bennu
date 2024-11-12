@@ -19,6 +19,39 @@ chmod +x install.sh
 ./install.sh
 rm ./install.sh
 
+# https://github.com/zeromq/pyzmq/blob/cddb63a76c2e09dbf51d9b3902a527a8588e7964/examples/draft/install.sh
+# 1. install libzmq with draft enabled
+ZMQ_VERSION=4.3.4
+PREFIX=${PREFIX:-/usr/local}
+PYZMQ=${PYZMQ:-pyzmq}
+CPU_COUNT=${CPU_COUNT:-$(python3 -c "import os; print(os.cpu_count())")}
+
+echo "installing libzmq to $PREFIX"
+$WGETCMD https://github.com/zeromq/libzmq/releases/download/v${ZMQ_VERSION}/zeromq-${ZMQ_VERSION}.tar.gz -O libzmq.tar.gz
+tar -xzf libzmq.tar.gz
+cd zeromq-${ZMQ_VERSION}
+./configure --prefix="${PREFIX}" --enable-drafts
+make -j${CPU_COUNT} && make install
+
+# install pyzmq with drafts enabled
+# By specifying ``--no-binary pyzmq``, pip knows to not install wheels, and will compile pyzmq from source.
+
+echo "installing ${PYZMQ}"
+export ZMQ_PREFIX=${PREFIX}
+export ZMQ_DRAFT_API=1
+
+$PIPINSTALL -v --no-binary pyzmq --pre "${PYZMQ}"
+
+cat << END | python3
+import sys
+import zmq
+print('python: %s' % sys.executable)
+print(sys.version)
+print('pyzmq-%s' % zmq.__version__)
+print('libzmq-%s' % zmq.zmq_version())
+print('Draft API available: %s' % zmq.DRAFT_API)
+END
+
 printf "\n\tINSTALLING HELICS/PYHELICS...\n\n"
 wget --no-check-certificate -O pyhelics.tgz https://github.com/GMLC-TDC/pyhelics/releases/download/v2.7.1/helics-2.7.1.tar.gz
 mkdir -p /tmp/pyhelics
