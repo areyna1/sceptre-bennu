@@ -133,7 +133,7 @@ public:
         mLock(),
         mDebug(debug)
     {
-        publishRate_setting = publishRate;
+        
         mPublishSemaphore = sem_open(PUBLISH_SEM, O_CREAT, 0644, 0);
         if(SEM_FAILED == mPublishSemaphore)
         {
