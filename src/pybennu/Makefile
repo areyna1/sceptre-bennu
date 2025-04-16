@@ -123,6 +123,7 @@ deb: packagetools
 		-d python3-setuptools \
 		-d wget \
 		-d libboost-python-dev \
+		-d libzmq5-dev \
 		-p '$(subst __colon__,:,$(DIST_DIR)/$(PACKAGE_FILENAME))' \
 		--name '$(PACKAGE_NAME)' \
 		$(call iter,$(PACKAGE_VENDOR),--vendor) \
